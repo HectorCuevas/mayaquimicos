@@ -33,7 +33,7 @@ namespace FELFactura
             ReaderDataset();
 
             //armar xml
-            getXML();
+            getXML(frases);
 
             //firmar xml por certificado
             var nombre = fac_num.Trim() + ".xml";
@@ -85,7 +85,7 @@ namespace FELFactura
 
 
 
-        private String getXML()
+        private String getXML(string f)
         {
             XNamespace dte = XNamespace.Get("http://www.sat.gob.gt/dte/fel/0.2.0");
             XNamespace xd = XNamespace.Get("http://www.w3.org/2000/09/xmldsig#");
@@ -156,6 +156,22 @@ namespace FELFactura
             DireccionReceptor.Add(MunicipioReceptor);
             DireccionReceptor.Add(DepartamentoReceptor);
             DireccionReceptor.Add(PaisReceptor);
+
+            //frases
+            XElement Frases = new XElement(dte + "Frases");
+            DatosEmision.Add(Frases);
+
+
+            int ss = setFrases(f).Length;
+            for (int i = 0; i < ss; i++)
+            {
+                string[] arr = setFrases(f);
+                string cod = setNumerosFrases(arr[i])[0];
+                string tipo = setNumerosFrases(arr[i])[1];
+
+                XElement frase = new XElement(dte + "Frase", new XAttribute("CodigoEscenario", cod), new XAttribute("TipoFrase", tipo));
+                Frases.Add(frase);
+            }
 
             // detalle de factura 
 
@@ -269,6 +285,18 @@ namespace FELFactura
                 System.IO.File.WriteAllText(path, ex.Message);
             }
             return res;
+        }
+
+        private string[] setFrases(string xfrases)
+        {
+
+            return xfrases.Split(';');
+        }
+
+        private string[] setNumerosFrases(string xfrases)
+        {
+
+            return xfrases.Split(',');
         }
 
     }

@@ -34,7 +34,7 @@ namespace FELFactura
             ReaderDataset();
             
             //armar xml
-            getXML();
+            getXML(frases);
             
             //firmar xml por certificado
             var nombre = fac_num.Trim() + ".xml";
@@ -85,7 +85,7 @@ namespace FELFactura
 
 
 
-           private String getXML()
+           private String getXML(string f)
         {
             
             XNamespace dte = XNamespace.Get("http://www.sat.gob.gt/dte/fel/0.2.0");
@@ -159,14 +159,18 @@ namespace FELFactura
             //frases
             XElement Frases = new XElement(dte + "Frases");
             DatosEmision.Add(Frases);
-            //XElement Frase1 = new XElement(dte + "Frase", new XAttribute("CodigoEscenario", "1"), new XAttribute("TipoFrase", "1"));
-            //Frases.Add(Frase1);
-            ////  XElement Frase2 = new XElement(dte + "Frase", new XAttribute("CodigoEscenario", "2"), new XAttribute("TipoFrase", "1"));
-            //XElement Frase2 = new XElement(dte + "Frase", new XAttribute("CodigoEscenario", "1"), new XAttribute("TipoFrase", "2"));
-            //Frases.Add(Frase2);
 
-            XElement Frase3 = new XElement(dte + "Frase", new XAttribute("CodigoEscenario", "1"), new XAttribute("TipoFrase", "4"));
-            Frases.Add(Frase3);
+
+            int ss = setFrases(f).Length;
+            for (int i = 0; i < ss; i++)
+            {
+                string[] arr = setFrases(f);
+                string cod = setNumerosFrases(arr[i])[0];
+                string tipo = setNumerosFrases(arr[i])[1];
+
+                XElement frase = new XElement(dte + "Frase", new XAttribute("CodigoEscenario", cod), new XAttribute("TipoFrase", tipo));
+                Frases.Add(frase);
+            }
 
             // detalle de factura 
 
@@ -261,5 +265,17 @@ namespace FELFactura
             }
             return res;
         }
+
+        private string[] setFrases(string xfrases)
+        {
+
+            return xfrases.Split(';');
         }
+
+        private string[] setNumerosFrases(string xfrases)
+        {
+
+            return xfrases.Split(',');
+        }
+    }
 }
